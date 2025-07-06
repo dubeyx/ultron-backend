@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const sequelize = require('./config/database');
 const transporterRoutes = require('./routes/transporterRoutes');
+const shipperRoutes = require('./routes/shipperRoutes');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use('/api/transporters', transporterRoutes);
-app.use('/api/shipper', transporterRoutes);
+app.use('/api/shipper', shipperRoutes);
 
 // Error handling middleware
 app.use(notFound);
