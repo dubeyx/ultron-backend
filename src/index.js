@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use('/api/transporters', transporterRoutes);
+app.use('/api/shipper', transporterRoutes);
 
 // Error handling middleware
 app.use(notFound);
