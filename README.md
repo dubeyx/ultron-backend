@@ -13,7 +13,11 @@
    ```
    npm run dev
    ```
-
+## Setup With docker
+1. Start the development server:
+   ```
+   docker compose up --build
+   ```
 ## API Documentation
 
 ### Register a Transporter
