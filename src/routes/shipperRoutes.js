@@ -5,10 +5,10 @@ const router = express.Router();
 
 // Public routes
 // POST route for transporter registration
-router.post('/register', transporterController.shipperTransporter);
+router.post('/register', shipperController.registerShipper);
 
 // POST route for transporter login
-router.post('/login', transporterController.shipperTransporter);
+router.post('/login', shipperController.loginShipper);
 
 // Protected routes (requires authentication)
 // GET route for protected home page

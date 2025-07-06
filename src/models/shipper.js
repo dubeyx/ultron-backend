@@ -54,18 +54,9 @@ const Shipper = sequelize.define('Shipper', {
     field: 'owner_contact_number',
     defaultValue: null,
   },
-  serviceArea: {
-    type: DataTypes.ENUM('district', 'cities', 'all_india'),
-    field: 'service_area',
-    defaultValue: null,
-  },
-  pincode: {
-    type: DataTypes.STRING,
-    defaultValue: null,
-  },
   // POC fields
   pocName: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false,
     field: 'poc_name',
   },
@@ -76,12 +67,12 @@ const Shipper = sequelize.define('Shipper', {
     field: 'poc_email',
   },
   pocDesignation: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: true,
     field: 'poc_designation',
   },
   pocContactNumber: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
     field: 'poc_contact_number',
   },
