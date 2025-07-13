@@ -8,6 +8,29 @@ const Shipper = sequelize.define('Shipper', {
     primaryKey: true,
     autoIncrement: true,
   },
+  // New fields for signup API
+  name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'name'
+  },
+   mobileNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'mobile_number',
+    validate: {
+      isTenDigitNumber(value) {
+        if (value && !/^\d{10}$/.test(value)) {
+          throw new Error('Mobile number must be a 10 digit number');
+        }
+      }
+    }
+  },
+  designation: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'designation'
+  },
   companyName: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -20,19 +43,20 @@ const Shipper = sequelize.define('Shipper', {
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true, // Changed to true as it's conditionally required with mobileNumber
+    field: 'email',
     unique: true,
-    validate: { isEmail: true },
-    field: 'company_email',
+    validate: { isEmail: true }
   },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
+    field: 'password',
   },
   customerServiceNumber: {
     type: DataTypes.STRING,
-    allowNull: false,
     field: 'customer_service_number',
+    defaultValue: null,
   },
   gstNumber: {
     type: DataTypes.STRING,
@@ -57,23 +81,23 @@ const Shipper = sequelize.define('Shipper', {
   // POC fields
   pocName: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    defaultValue: null,
     field: 'poc_name',
   },
   pocEmail: {
     type: DataTypes.STRING,
-    allowNull: false,
+    defaultValue: null,
     validate: { isEmail: true },
     field: 'poc_email',
   },
   pocDesignation: {
     type: DataTypes.STRING(255),
-    allowNull: true,
+    defaultValue: null,
     field: 'poc_designation',
   },
   pocContactNumber: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+    type: DataTypes.STRING,
+    defaultValue: null,
     field: 'poc_contact_number',
   },
   createdAt: {

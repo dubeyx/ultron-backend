@@ -28,18 +28,14 @@ app.use(errorHandler);
 // Database connection and server start
 const startServer = async () => {
   try {
-    await sequelize.authenticate();
-    console.log('Database connection established successfully.');
-    
-    // Sync database models (set force: false in production)
-    await sequelize.sync({ force: false });
-    console.log('Database synchronized.');
+    // Database connection and sync is already handled in database.js
+    // No need to authenticate or sync again here
     
     app.listen(PORT, () => {
       console.log(`Ultron server running on http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('Unable to start server:', error);
     process.exit(1);
   }
 };

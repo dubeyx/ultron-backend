@@ -9,6 +9,29 @@ const Transporter = sequelize.define('Transporter', {
     primaryKey: true,
     autoIncrement: true,
   },
+  // New fields for signup API
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false, 
+    field: 'name'
+  },
+  mobileNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'mobile_number',
+    validate: {
+      isTenDigitNumber(value) {
+        if (value && !/^\d{10}$/.test(value)) {
+          throw new Error('Mobile number must be a 10 digit number');
+        }
+      }
+    }
+  },
+  designation: {
+    type: DataTypes.STRING,
+    allowNull: false, 
+    field: 'designation'
+  },
   // Required fields as per the specifications
   companyName: {
     type: DataTypes.STRING,
@@ -22,12 +45,11 @@ const Transporter = sequelize.define('Transporter', {
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true, // Changed to true as it's conditionally required with mobileNumber
     unique: true,
     validate: {
       isEmail: true
-    },
-    field: 'company_email'
+    }
   },
   password: {
     type: DataTypes.STRING,
@@ -35,13 +57,21 @@ const Transporter = sequelize.define('Transporter', {
   },
   customerServiceNumber: {
     type: DataTypes.STRING,
-    allowNull: false,
+    defaultValue: null,
     field: 'customer_service_number'
   },
   gstNumber: {
     type: DataTypes.STRING,
     field: 'gst_number',
-    defaultValue: null
+    allowNull: false,
+    validate: {
+      // Custom GST validation
+      isValidGST(value) {
+        if (value && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value)) {
+          throw new Error('Invalid GST number format');
+        }
+      }
+    }
   },
   cinNumber: {
     type: DataTypes.STRING,
