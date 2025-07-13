@@ -23,9 +23,22 @@ const sequelize = new Sequelize(
   }
 );
 
-// Test connection
+// Test connection and sync schema
 sequelize.authenticate()
-  .then(() => console.log('Database connected!'))
+  .then(() => {
+    console.log('Database connected!');
+    // Sync all models with database
+    // In development, you might want to use { alter: true }
+    // In production, you should use { alter: false } or handle migrations properly
+    const syncOptions = process.env.NODE_ENV === 'production' 
+      ? { alter: false } 
+      : { alter: true };
+    
+    return sequelize.sync(syncOptions);
+  })
+  .then(() => {
+    console.log('Database schema synchronized!');
+  })
   .catch(err => console.error('Connection error:', err));
 
 module.exports = sequelize;
