@@ -1,5 +1,7 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });//.env not in /src
 const express = require('express');
-require('dotenv').config();
+const { connectRedis } = require('./config/redis');
+const otpRoutes = require('./routes/otpRoutes');
 const sequelize = require('./config/database');
 const transporterRoutes = require('./routes/transporterRoutes');
 const shipperRoutes = require('./routes/shipperRoutes');
@@ -20,6 +22,7 @@ app.get('/', (req, res) => {
 });
 
 // API Routes
+app.use('/api/otp', otpRoutes);
 app.use('/api/transporters', transporterRoutes);
 app.use('/api/shipper', shipperRoutes);
 

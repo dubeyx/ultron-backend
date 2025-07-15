@@ -12,7 +12,7 @@ This document outlines the API contracts for shipper and transporter authenticat
 
 Register a new shipper user in the system.
 
-**Endpoint:** `/api/shippers/signup`
+**Endpoint:** `/api/shipper/signup`
 
 **Method:** `POST`
 
@@ -64,7 +64,7 @@ Register a new shipper user in the system.
 
 Authenticate an existing shipper user.
 
-**Endpoint:** `/api/shippers/login`
+**Endpoint:** `/api/shipper/login`
 
 **Method:** `POST`
 
@@ -104,7 +104,7 @@ Authenticate an existing shipper user.
 
 Register a shipper with complete company profile details.
 
-**Endpoint:** `/api/shippers/register`
+**Endpoint:** `/api/shipper/register`
 
 **Method:** `POST`
 
@@ -366,3 +366,74 @@ All endpoints may return these common error responses:
   "message": "Too many requests. Please try again later."
 }
 ```
+## OTP APIs
+
+### 1. Send OTP
+
+Send a one-time password (OTP) to a given phone number using Twilio.
+
+**Endpoint:** `/api/otp/send`  
+**Method:** `POST`
+
+**Request Body:**
+```json
+{
+  "phoneNumber": "+911234567890"
+}
+```
+
+**Response (Success - 200):**
+```json
+{
+  "message": "OTP sent successfully"
+}
+```
+
+**Response (Error - 500):**
+```json
+{
+  "message": "Failed to send OTP",
+  "error": "Twilio error message or Redis error"
+}
+```
+
+---
+
+### 2. Verify OTP
+
+Verify if the provided OTP matches the one stored in Redis for the given phone number.
+
+**Endpoint:** `/api/otp/verify`  
+**Method:** `POST`
+
+**Request Body:**
+```json
+{
+  "phoneNumber": "+911234567890",
+  "otp": "123456"
+}
+```
+
+**Response (Success - 200):**
+```json
+{
+  "message": "OTP verified successfully"
+}
+```
+
+**Response (Error - 401):**
+```json
+{
+  "message": "Invalid OTP"
+}
+```
+
+**Response (Error - 500):**
+```json
+{
+  "message": "Error verifying OTP",
+  "error": "Redis error or internal server issue"
+}
+```
+
+---
