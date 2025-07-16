@@ -14,7 +14,7 @@ const Shipper = sequelize.define('Shipper', {
     allowNull: true,
     field: 'name'
   },
-   mobileNumber: {
+  mobileNumber: {
     type: DataTypes.STRING,
     allowNull: true,
     field: 'mobile_number',
@@ -47,6 +47,12 @@ const Shipper = sequelize.define('Shipper', {
     field: 'email',
     unique: true,
     validate: { isEmail: true }
+  },
+  emailVerified: { //Needed to check if users email has been verified of not
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+    field: 'email_verified'
   },
   password: {
     type: DataTypes.STRING,
@@ -130,7 +136,7 @@ const Shipper = sequelize.define('Shipper', {
 });
 
 // Instance method to verify password
-Shipper.prototype.comparePassword = async function(candidatePassword) {
+Shipper.prototype.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
