@@ -38,6 +38,11 @@ const validateSignupInput = async (req) => {
     console.log('Validation error: Invalid GST number format');
     errors.push('Invalid GST number format');
   }
+  //Check if gst number already exists
+  if(gstNumber){
+    const existingGstNumber= await Shipper.findOne({where:{gstNumber}});
+    if(existingGstNumber) errors.push('Gst Number is already registered, please login')
+  }
 
   // // Check if email or mobileNumber already exists(2 GST NUMBER CAN HAVE SAME PHONE NUMBER AND EMAIL)
   // if (email) {

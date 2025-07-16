@@ -2,12 +2,12 @@ const { redisClient } = require('../config/redis');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const client = require('twilio')(process.env.ACCOUNTSID, process.env.AUTHTOKEN);
-const {getUserModel,sendEmail} = require('../utils/index');
+const {getUserModel,sendEmail} = require('../utils/helperUtils');
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 //OTP sender function to user mobile number
-const sendOtp = async (req, res) => {
+exports.sendOtp = async (req, res) => {
   const { phoneNumber } = req.body;
   const otp = generateOtp();
 
@@ -27,24 +27,27 @@ const sendOtp = async (req, res) => {
 };
 
 //OTP verifier function
-const verifyOtp = async (req, res) => {
+exports.verifyOtp = async (req, res) => {
   const { phoneNumber, otp } = req.body;
 
   try {
     const cachedOtp = await redisClient.get(`${phoneNumber}_phoneOtp`);
 
+    if(!cachedOtp) {
+      return res.status(400).json({message:"OTP has expired"});
+    }
     if (cachedOtp === otp) {
-      res.json({ message: 'OTP verified successfully' });
+      return res.json({ message: 'OTP verified successfully' });
     } else {
-      res.status(401).json({ message: 'Invalid OTP' });
+      return res.status(401).json({ message: 'Invalid OTP' });
     }
   } catch (err) {
-    res.status(500).json({ message: 'Error verifying OTP', error: err.message });
+    return res.status(500).json({ message: 'Error verifying OTP', error: err.message });
   }
 };
 
 // Function to check if user is verified or not
-async function checkVerificationStatus(req, res) {
+exports.checkVerificationStatus = async (req, res) => {
   const { gstNumber, userType } = req.body;
 
   try {
@@ -52,7 +55,7 @@ async function checkVerificationStatus(req, res) {
     const user = await Model.findOne({ where: { gstNumber } });
 
     if (!user) return res.status(404).json({ status: 'user_not_found' });
-    if (user.emailVerified) return res.status(200).json({ status: 'verified' });
+    if (user.isEmailVerified) return res.status(200).json({ status: 'verified' });
 
     const tokenExists = await redisClient.get(`${userType}:${gstNumber}`);
     if (tokenExists) return res.status(200).json({ status: 'token_sent_not_verified' });
@@ -61,12 +64,12 @@ async function checkVerificationStatus(req, res) {
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });
   }
-}
+};
 
 // Function to send verification email
-async function sendVerificationEmail(req, res) {
+exports.sendVerificationEmail = async (req, res) => {
   const { gstNumber, userType } = req.body;
-
+  
   try {
     const Model = getUserModel(userType);
     const user = await Model.findOne({ where: { gstNumber } });
@@ -95,39 +98,42 @@ async function sendVerificationEmail(req, res) {
   } catch (error) {
     return res.status(500).json({ error: 'Internal server error' });
   }
-}
+};
 
 // Function to verify token
-async function verifyEmailToken(req, res) {
+exports.verifyEmailToken = async (req, res) => {
   const { token } = req.body;
+
+  if (!token) return res.status(400).json({ message: 'Token is required' });
+
+  let decoded;
   try {
-    if (!token) return res.status(400).json({ message: 'Token is required' });
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return res.status(400).json({ message: 'Invalid or expired token' });
+  }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { gstNumber, userType } = decoded;
+  const { gstNumber, userType } = decoded;
 
+  try {
     const Model = getUserModel(userType);
     const user = await Model.findOne({ where: { gstNumber } });
 
     if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.emailVerified) return res.status(200).json({ message: 'Email already verified' });
+    if (user.isEmailVerified) return res.status(200).json({ message: 'Email already verified' });
 
     const storedToken = await redisClient.get(`${userType}:${gstNumber}`);
     if (!storedToken || storedToken !== token) {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
-    user.emailVerified = true;
+    user.isEmailVerified = true;
     await user.save();
     await redisClient.del(`${userType}:${gstNumber}`);
 
     return res.status(200).json({ message: 'Email verified successfully' });
   } catch (error) {
-    return res.status(400).json({ message: 'Invalid or expired token' });
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
-}
+};
 
-
-
-
-module.exports = { sendOtp, verifyOtp,checkVerificationStatus,sendVerificationEmail,verifyEmailToken };

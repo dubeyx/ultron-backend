@@ -372,7 +372,7 @@ All endpoints may return these common error responses:
 
 Send a one-time password (OTP) to a given phone number using Twilio.
 
-**Endpoint:** `/api/validate/sendotp`  
+**Endpoint:** `/api/validate/send-otp`  
 **Method:** `POST`
 
 **Request Body:**
@@ -403,7 +403,7 @@ Send a one-time password (OTP) to a given phone number using Twilio.
 
 Verify if the provided OTP matches the one stored in Redis for the given phone number.
 
-**Endpoint:** `/api/validate/verifyotp`  
+**Endpoint:** `/api/validate/verify-otp`  
 **Method:** `POST`
 
 **Request Body:**
@@ -411,6 +411,12 @@ Verify if the provided OTP matches the one stored in Redis for the given phone n
 {
   "phoneNumber": "+911234567890",
   "otp": "123456"
+}
+```
+**Response (Error-400):**
+```json
+{
+  "message":"OTP has expired"
 }
 ```
 
@@ -446,7 +452,7 @@ Check if the user’s email is:
 - Has a verification token already sent but not verified,
 - Or has no token sent yet.
 
-**Endpoint:** `/api/email/checkemailstatus`  
+**Endpoint:** `/api/email/check-email-status`  
 **Method:** `POST`
 
 **Request Body:**
@@ -477,7 +483,7 @@ Check if the user’s email is:
 
 Sends a new email verification link. If a token already exists, it is overwritten.
 
-**Endpoint:** `/api/email/sendemaillink`  
+**Endpoint:** `/api/email/send-email-link`  
 **Method:** `POST`
 
 **Request Body:**
@@ -507,9 +513,9 @@ Sends a new email verification link. If a token already exists, it is overwritte
 ### 3. Verify Email via Token
 
 Triggered when the user clicks the verification link sent to their email.
-(FrontendUrl/verify-email?token=${token})
+(link-  FrontendUrl/verify-email?token=${token})
 
-**Endpoint:** `/api/email/verifyemaillink`  
+**Endpoint:** `/api/email/verify-email-link`  
 **Method:** `GET`
 
 **Query Parameters:**

@@ -1,6 +1,11 @@
-// utils/sendEmail.js
-
+const { Shipper,Transporter} = require("../models/index");
 const nodemailer = require('nodemailer');
+
+exports.getUserModel = (userType) => {
+  if (userType === 'shipper') return Shipper;
+  if (userType === 'transporter') return Transporter;
+  throw new Error('Invalid userType');
+}
 
 const transporter = nodemailer.createTransport({
   service: 'gmail', 
@@ -10,7 +15,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-async function sendEmail({ to, subject, html }) {
+exports.sendEmail = async({ to, subject, html }) => {
   const mailOptions = {
     from: `"Ultron Support" <${process.env.EMAIL_USER}>`,
     to,
@@ -20,5 +25,3 @@ async function sendEmail({ to, subject, html }) {
 
   await transporter.sendMail(mailOptions);
 }
-
-module.exports = sendEmail;

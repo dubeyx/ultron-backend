@@ -1,22 +1,22 @@
 const express = require('express');
-const { sendOtp, verifyOtp,checkVerificationStatus,sendVerificationEmail,verifyEmailToken } = require('../controllers/ValidationController');
+const ValidationController = require('../controllers/ValidationController');
 const router = express.Router();
 
 
 //POST route for sending otp to users phone number
-router.post('/sendotp', sendOtp);
+router.post('/send-otp', ValidationController.sendOtp);
 
 //POST route for verifiying otp
-router.post('/verifyotp', verifyOtp);
+router.post('/verify-otp', ValidationController.verifyOtp);
 
 // POST - Check if user email is verified / token status
-router.post('/checkemailstatus', checkVerificationStatus);
+router.post('/check-email-status', ValidationController.checkVerificationStatus);
 
 // POST - Send new verification email (removes old token if exists)
-router.post('/sendemaillink', sendVerificationEmail);
+router.post('/send-email-link', ValidationController.sendVerificationEmail);
 
 // GET - Verify email via token (used in email link)
-router.get('/verifyemaillink', verifyEmailToken);
+router.get('/verify-email-link', ValidationController.verifyEmailToken);
 
 
 
