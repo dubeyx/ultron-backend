@@ -1,7 +1,7 @@
 const { redisClient } = require('../config/redis');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const client = require('twilio')(process.env.ACCOUNTSID, process.env.AUTHTOKEN);
+const client = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const {getUserModel,sendEmail} = require('../utils/helperUtils');
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -16,7 +16,7 @@ exports.sendOtp = async (req, res) => {
 
     await client.messages.create({
       body: `Your OTP is: ${otp}`,
-      from: process.env.PHONENUMBER,
+      from: process.env.TWILIO_PHONE_NUMBER,
       to: mobileNumber
     });
 
