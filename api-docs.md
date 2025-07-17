@@ -378,7 +378,7 @@ Send a one-time password (OTP) to a given phone number using Twilio.
 **Request Body:**
 ```json
 {
-  "phoneNumber": "+911234567890"
+  "mobileNumber": "+911234567890"
 }
 ```
 
@@ -409,7 +409,7 @@ Verify if the provided OTP matches the one stored in Redis for the given phone n
 **Request Body:**
 ```json
 {
-  "phoneNumber": "+911234567890",
+  "mobileNumber": "+911234567890",
   "otp": "123456"
 }
 ```
@@ -500,14 +500,25 @@ Sends a new email verification link. If a token already exists, it is overwritte
   "message": "Verification email sent"
 }
 ```
-
-**Response (Error - 404 or 500):**
+**Response (Error - 400):**
 ```json
 {
-  "message": "User not found" // or internal error message
+  "message":"Invalid userType"
 }
 ```
-
+**Response (Error - 404):**
+```json
+{
+  "message": "User not found" 
+}
+```
+**Response (Error - 500):**
+```json
+{
+  "message":"Internal server error",
+  "error": "error.message"
+}
+```
 ---
 
 ### 3. Verify Email via Token
@@ -537,9 +548,24 @@ Triggered when the user clicks the verification link sent to their email.
 }
 ```
 
-**Response (Error - 400 or 500):**
+**Response (Error - 400):**
 ```json
 {
   "message": "Invalid or expired token"
 }
 ```
+**Respnse(Error - 404):**
+```json
+{
+  "message":"User not found"
+}
+```
+**Response(Error - 500):**
+```json
+{
+  "message": "Internal server error", 
+  "error" : "error.message"
+}
+```
+
+---

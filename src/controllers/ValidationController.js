@@ -8,16 +8,16 @@ const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString()
 
 //OTP sender function to user mobile number
 exports.sendOtp = async (req, res) => {
-  const { phoneNumber } = req.body;
+  const { mobileNumber } = req.body;
   const otp = generateOtp();
 
   try {
-    await redisClient.set(`${phoneNumber}_phoneOtp`, otp, { EX: 60 });
+    await redisClient.set(`${mobileNumber}_phoneOtp`, otp, { EX: 60 });
 
     await client.messages.create({
       body: `Your OTP is: ${otp}`,
       from: process.env.PHONENUMBER,
-      to: phoneNumber
+      to: mobileNumber
     });
 
     res.json({ message: 'OTP sent successfully' });
@@ -28,10 +28,10 @@ exports.sendOtp = async (req, res) => {
 
 //OTP verifier function
 exports.verifyOtp = async (req, res) => {
-  const { phoneNumber, otp } = req.body;
+  const { mobileNumber, otp } = req.body;
 
   try {
-    const cachedOtp = await redisClient.get(`${phoneNumber}_phoneOtp`);
+    const cachedOtp = await redisClient.get(`${mobileNumber}_phoneOtp`);
 
     if(!cachedOtp) {
       return res.status(400).json({message:"OTP has expired"});
@@ -76,8 +76,9 @@ exports.sendVerificationEmail = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // Clear existing token
-    await redisClient.del(`${userType}:${gstNumber}`);
+    // Check if user already have an active token
+    const tokenExists = await redisClient.get(`${userType}:${gstNumber}`);
+    if(tokenExists) return res.status(200).json({ status: 'active_token_exists' });
 
     // Generate JWT token
     const token = jwt.sign({ gstNumber, userType }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -96,7 +97,8 @@ exports.sendVerificationEmail = async (req, res) => {
     });
     return res.status(200).json({ message: 'Verification email sent' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    if(error.message=="Invalid userType") return res.status(400).json({error:error.message});
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -133,7 +135,7 @@ exports.verifyEmailToken = async (req, res) => {
 
     return res.status(200).json({ message: 'Email verified successfully' });
   } catch (error) {
-    return res.status(500).json({ message: 'Internal server error', error: error.message });
+    return res.status(500).json({ message: 'Internal server error', error : error.message });
   }
 };
 
